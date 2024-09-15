@@ -119,45 +119,50 @@ session_start();
     <div class="container">
         <h2>Select Details</h2>
         <form action="attendance.php" method="POST">
-            <div class="dropdown-section">
-                <label for="branch">Branch:</label>
-                <select id="branch" name="branch">
-                    <option value="">Select Branch</option>
-                    <!-- Options populated dynamically -->
-                </select>
-            </div>
-            <div class="dropdown-section">
-                <label for="semester">Semester:</label>
-                <select id="semester" name="semester">
-                    <option value="">Select Semester</option>
-                    <!-- Options populated dynamically -->
-                </select>
-            </div>
-            <div class="dropdown-section">
-                <label for="course">Course:</label>
-                <select id="course" name="course">
-                    <option value="">Select Course</option>
-                    <!-- Options populated dynamically -->
-                </select>
-            </div>
-            <div class="dropdown-section">
-                <label for="division">Division:</label>
-                <select id="division" name="division">
-                    <option value="">Select Division</option>
-                    <!-- Options populated dynamically -->
-                </select>
-            </div>
-            <div class="dropdown-section">
-                <label for="faculty">Faculty:</label>
-                <select id="faculty" name="faculty">
-                    <option value="">Select Faculty</option>
-                    <!-- Options populated dynamically -->
-                </select>
-            </div>
-            <div class="submit-section">
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </div>
-        </form>
+    <div class="dropdown-section">
+        <label for="date">Select Date:</label>
+        <input type="date" name="date" id="date" required>
+    </div>
+    <div class="dropdown-section">
+        <label for="branch">Branch:</label>
+        <select id="branch" name="branch" required>
+            <option value="">Select Branch</option>
+            <!-- Dynamically populated -->
+        </select>
+    </div>
+    <div class="dropdown-section">
+        <label for="semester">Semester:</label>
+        <select id="semester" name="semester" required>
+            <option value="">Select Semester</option>
+            <!-- Dynamically populated -->
+        </select>
+    </div>
+    <div class="dropdown-section">
+        <label for="course">Course:</label>
+        <select id="course" name="course" required>
+            <option value="">Select Course</option>
+            <!-- Dynamically populated -->
+        </select>
+    </div>
+    <div class="dropdown-section">
+        <label for="division">Division:</label>
+        <select id="division" name="division" required>
+            <option value="">Select Division</option>
+            <!-- Dynamically populated -->
+        </select>
+    </div>
+    <div class="dropdown-section">
+        <label for="faculty">Faculty:</label>
+        <select id="faculty" name="faculty" required>
+            <option value="">Select Faculty</option>
+            <!-- Dynamically populated -->
+        </select>
+    </div>
+    <div class="submit-section">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+
     </div>
 </main>
 
@@ -194,12 +199,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     branchSelect.addEventListener('change', function() {
         populateDropdown(courseSelect, []); // Clear courses on branch change
-        populateDropdown(facultySelect, []); // Clear faculties on branch change
+        
     });
 
     semesterSelect.addEventListener('change', function() {
         populateDropdown(courseSelect, []); // Clear courses on semester change
-        populateDropdown(facultySelect, []); // Clear faculties on semester change
+        
     });
 
     // Fetch and populate courses based on branch and semester selection
@@ -224,18 +229,12 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(data => populateDropdown(divisionSelect, data))
         .catch(error => console.error('Error fetching divisions:', error));
 
-    // Fetch and populate faculties based on course and branch selection
-    courseSelect.addEventListener('change', function() {
-        const courseName = courseSelect.value;
-        const branchName = branchSelect.value;
-
-        if (courseName && branchName) {
-            fetch(`get-faculty.php?branch_name=${branchName}`)
-                .then(response => response.json())
-                .then(data => populateDropdown(facultySelect, data))
-                .catch(error => console.error('Error fetching faculties:', error));
-        }
-    });
+    fetch('get-faculties.php')
+        .then(response => response.json())
+        .then(data => populateDropdown(facultySelect, data))
+        .catch(error => console.error('Error fetching faculty:', error));
+    
+       
 });
 
 </script>

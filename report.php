@@ -20,12 +20,11 @@ function fetchOptions($table) {
     return $options;
 }
 
-// Fetch options for branches, semesters, courses, divisions, and faculties
+// Fetch options for branches, semesters, courses, divisions
 $branches = fetchOptions('branch');
 $semesters = fetchOptions('semester');
 $courses = fetchOptions('courses');
 $divisions = fetchOptions('division');
-$faculties = fetchOptions('faculty');
 ?>
 
 <!DOCTYPE html>
@@ -43,13 +42,13 @@ $faculties = fetchOptions('faculty');
         header {
             background-color: #0073e6;
             color: white;
-            padding: 5px 0;
+            padding: 10px 0;
             text-align: center;
         }
         .container {
             padding: 20px;
-            margin-top: 20px;
             background-color: white;
+            margin-top: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
@@ -81,7 +80,7 @@ $faculties = fetchOptions('faculty');
             <select id="branch" name="branch" class="form-control">
                 <option value="">Select Branch</option>
                 <?php foreach ($branches as $branch): ?>
-                    <option value="<?= $branch ?>"><?= $branch ?></option>
+                    <option value="<?= htmlspecialchars($branch) ?>"><?= htmlspecialchars($branch) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -91,7 +90,7 @@ $faculties = fetchOptions('faculty');
             <select id="semester" name="semester" class="form-control">
                 <option value="">Select Semester</option>
                 <?php foreach ($semesters as $semester): ?>
-                    <option value="<?= $semester ?>"><?= $semester ?></option>
+                    <option value="<?= htmlspecialchars($semester) ?>"><?= htmlspecialchars($semester) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -101,7 +100,7 @@ $faculties = fetchOptions('faculty');
             <select id="course" name="course" class="form-control">
                 <option value="">Select Course</option>
                 <?php foreach ($courses as $course): ?>
-                    <option value="<?= $course ?>"><?= $course ?></option>
+                    <option value="<?= htmlspecialchars($course) ?>"><?= htmlspecialchars($course) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -111,39 +110,23 @@ $faculties = fetchOptions('faculty');
             <select id="division" name="division" class="form-control">
                 <option value="">Select Division</option>
                 <?php foreach ($divisions as $division): ?>
-                    <option value="<?= $division ?>"><?= $division ?></option>
-                <?php endforeach; ?>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="faculty">Faculty:</label>
-            <select id="faculty" name="faculty" class="form-control">
-                <option value="">Select Faculty</option>
-                <?php foreach ($faculties as $faculty): ?>
-                    <option value="<?= $faculty ?>"><?= $faculty ?></option>
+                    <option value="<?= htmlspecialchars($division) ?>"><?= htmlspecialchars($division) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
 
         <div class="form-group">
             <label for="date_from">From Date:</label>
-            <input type="date" id="date_from" name="date_from" class="form-control">
+            <input type="date" id="date_from" name="date_from" class="form-control" required>
         </div>
 
         <div class="form-group">
             <label for="date_to">To Date:</label>
-            <input type="date" id="date_to" name="date_to" class="form-control">
+            <input type="date" id="date_to" name="date_to" class="form-control" required>
         </div>
 
-        <form action="generate_report.php" method="POST">
-    <!-- Form fields -->
-    <!-- Your existing form fields here -->
-    <button type="submit" class="btn btn-primary">Generate Report</button>
-</form>
-
+        <button type="submit" class="btn btn-primary">Generate Report</button>
     </form>
 </div>
-
 </body>
 </html>

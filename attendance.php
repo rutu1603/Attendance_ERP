@@ -8,9 +8,26 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit;
 }
 
-// Fetch the student list from the database
-$query = "SELECT * FROM students";
-$result = $conn->query($query);
+// Retrieve selected filters from POST request
+$selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
+$branchName = isset($_POST['branch']) ? $_POST['branch'] : '';
+$semesterName = isset($_POST['semester']) ? $_POST['semester'] : '';
+$divisionName = isset($_POST['division']) ? $_POST['division'] : '';
+$courseName = isset($_POST['course']) ? $_POST['course'] : '';
+$facultyName = isset($_POST['faculty']) ? $_POST['faculty'] : '';
+
+// Fetch filtered students based on the selected criteria
+$query = "SELECT roll_no, name FROM students WHERE branch_name = ? AND semester_name = ? AND division_name = ? AND course_name = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("ssss", $branchName, $semesterName, $divisionName, $courseName);
+
+if ($stmt->execute()) {
+    $result = $stmt->get_result();
+} else {
+    // Handle query execution error
+    echo "Error: " . $stmt->error;
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -35,96 +52,115 @@ $result = $conn->query($query);
             background-color: #0073e6;
             color: white;
         }
-        .btn-default {
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            color: white;
-            background-color: black;
-        }
         .btn-present {
             background-color: green;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
         }
         .btn-absent {
             background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
         }
-        .btn-marked {
-            background-color: #6c757d;
+        .info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        .btn-marked-present {
-            background-color: green;
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
         }
-        .btn-marked-absent {
-            background-color: red;
+        .info-row p {
+            margin: 0;
+            padding: 5px;
+            flex: 1;
+        }
+        .info-row p b {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <header>
-        <!-- Include your header code here -->
-    </header>
+    <div class="container">
+        <h2>Attendance</h2>
 
-    <main>
-        <div class="container">
-            <h2>Attendance</h2>
-            <form id="attendance-form" action="attendance_process.php" method="post">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Serial No</th>
-                            <th>Roll No</th>
-                            <th>Name</th>
-                            <th>Attendance</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php $i = 1; while ($row = $result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?php echo $i++; ?></td>
-                                <td><?php echo htmlspecialchars($row['roll_no']); ?></td>
-                                <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                <td>
-                                    <button type="button" class="btn-default" onclick="markAttendance('<?php echo htmlspecialchars($row['roll_no']); ?>', 'present')">P</button>
-                                    <button type="button" class="btn-default" onclick="markAttendance('<?php echo htmlspecialchars($row['roll_no']); ?>', 'absent')">A</button>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-                <input type="hidden" id="attendance_data" name="attendance_data">
-                <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
-            </form>
+        <!-- Display selected filters -->
+        <div class="info">
+            <div class="info-row">
+                <p><b>Date:</b> <?php echo htmlspecialchars($selectedDate); ?></p>
+                <p><b>Branch:</b> <?php echo htmlspecialchars($branchName); ?></p>
+                <p><b>Semester:</b> <?php echo htmlspecialchars($semesterName); ?></p>
+                <p><b>Division:</b> <?php echo htmlspecialchars($divisionName); ?></p>
+                <p><b>Course:</b> <?php echo htmlspecialchars($courseName); ?></p>
+                <p><b>Faculty:</b> <?php echo htmlspecialchars($facultyName); ?></p>
+            </div>
         </div>
-    </main>
+
+        <form id="attendance-form" action="attendance_process.php" method="post">
+    <!-- Hidden fields to retain filters -->
+    <input type="hidden" name="selected_date" value="<?php echo htmlspecialchars($selectedDate); ?>">
+    <input type="hidden" name="branch" value="<?php echo htmlspecialchars($branchName); ?>">
+    <input type="hidden" name="semester" value="<?php echo htmlspecialchars($semesterName); ?>">
+    <input type="hidden" name="division" value="<?php echo htmlspecialchars($divisionName); ?>">
+    <input type="hidden" name="course" value="<?php echo htmlspecialchars($courseName); ?>">
+    <input type="hidden" name="faculty" value="<?php echo htmlspecialchars($facultyName); ?>">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Serial No</th>
+                <th>Roll No</th>
+                <th>Name</th>
+                <th>Attendance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $i = 1; while ($row = $result->fetch_assoc()): ?>
+                <tr>
+                    <td><?php echo $i++; ?></td>
+                    <td><?php echo htmlspecialchars($row['roll_no']); ?></td>
+                    <td><?php echo htmlspecialchars($row['name']); ?></td>
+                    <td>
+                        <!-- Default value is Present (1) -->
+                        <input type="hidden" name="attendance[<?php echo htmlspecialchars($row['roll_no']); ?>][name]" value="<?php echo htmlspecialchars($row['name']); ?>">
+                        <input type="hidden" name="attendance[<?php echo htmlspecialchars($row['roll_no']); ?>][status]" class="attendance-status" value="1">
+                        <button type="button" class="btn-present" onclick="toggleAttendance('<?php echo htmlspecialchars($row['roll_no']); ?>', this)">1</button>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+</form>
+
+
+    </div>
 
     <script>
-        function markAttendance(rollNo, status) {
-            let dataField = document.getElementById('attendance_data');
-            let currentData = dataField.value ? JSON.parse(dataField.value) : [];
+        // Function to toggle attendance between Present (1) and Absent (0)
+function toggleAttendance(roll_no, button) {
+    var statusField = document.querySelector('input[name="attendance[' + roll_no + '][status]"]');
+    if (button.classList.contains('btn-present')) {
+        // Switch to Absent (0)
+        button.classList.remove('btn-present');
+        button.classList.add('btn-absent');
+        button.textContent = '0';  // Display 0 for Absent
+        statusField.value = '0';  // Set status to 0 for Absent
+    } else {
+        // Switch back to Present (1)
+        button.classList.remove('btn-absent');
+        button.classList.add('btn-present');
+        button.textContent = '1';  // Display 1 for Present
+        statusField.value = '1';  // Set status to 1 for Present
+    }
+}
 
-            // Find existing entry or create a new one
-            let entry = currentData.find(e => e.roll_no === rollNo);
-            if (entry) {
-                entry.status = status;
-            } else {
-                currentData.push({ roll_no: rollNo, status: status });
-            }
-
-            // Update button states
-            document.querySelectorAll(`button[onclick*="${rollNo}"]`).forEach(button => {
-                if (button.textContent === (status === 'present' ? 'P' : 'A')) {
-                    button.classList.add(status === 'present' ? 'btn-marked-present' : 'btn-marked-absent');
-                    button.classList.remove('btn-default');
-                } else {
-                    button.classList.add('btn-default');
-                    button.classList.remove(status === 'present' ? 'btn-marked-present' : 'btn-marked-absent');
-                }
-            });
-
-            // Update hidden field
-            dataField.value = JSON.stringify(currentData);
-        }
     </script>
 </body>
 </html>
