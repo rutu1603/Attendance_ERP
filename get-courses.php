@@ -1,23 +1,44 @@
+
 <?php
+session_start();
 include "connection.php";
 
-$semester_name = isset($_GET['semester_name']) ? $_GET['semester_name'] : '';
-$branch_name = isset($_GET['branch_name']) ? $_GET['branch_name'] : '';
+if (isset($_SESSION['role']) && isset($_SESSION['branch'])) {
+    $role = $_SESSION['role'];
+    $branch_name = $_SESSION['branch'];
 
-$sql = "SELECT name FROM courses WHERE semester_name = ? AND branch_name = ?";
-$stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "ss", $semester_name, $branch_name);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+    if ($role == 'faculty') {
+        // Fetch courses for faculty based on their assigned courses
+        if (isset($_SESSION['courses'])) {
+            $courses = $_SESSION['courses'];
+            echo json_encode($courses);
+        } else {
+            echo json_encode(['error' => 'No courses found for the faculty.']);
+        }
+    } 
+    
+    else {
+        // Fetch courses based on the branch for non-faculty roles (admin/executive)
+        $sql = "SELECT name FROM courses WHERE branch_name = ?";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "s", $branch_name);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
-if (!$result) {
-    die("Query failed: " . mysqli_error($conn));
+        $courses = [];
+        while ($row = mysqli_fetch_assoc($result)) {
+            $courses[] = $row['name'];
+        }
+
+        if (!empty($courses)) {
+            echo json_encode($courses);
+        } else {
+            echo json_encode(['error' => 'No courses found for the branch.']);
+        }
+    }
+} else {
+    echo json_encode(['error' => 'Invalid role or branch.']);
 }
 
-$courses = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $courses[] = $row;
-}
 
-echo json_encode($courses);
 ?>

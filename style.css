@@ -1,0 +1,125 @@
+/* Body and general styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #0073e6;
+    color: white;
+    padding: 20px 0; /* Increased padding */
+    text-align: center;
+    position: relative;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px; /* Adjusted padding */
+}
+
+h1 {
+    font-size: 2.5rem; /* Increased header font size */
+}
+
+.logo {
+    height: 60px; /* Increased logo size */
+}
+
+.header-buttons button {
+    background-color: #005bb5;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-left: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.header-buttons button:hover {
+    background-color: #004494;
+}
+
+.navbar {
+    display: flex;
+    justify-content: center;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+}
+
+.navbar a:hover {
+    background-color: #005bb5;
+    color: white;
+}
+
+/* Form styles */
+h2 {
+    margin-bottom: 20px;
+}
+
+.container {
+    max-width: 1000px; /* Adjust form width */
+    margin: 0 auto;
+}
+
+form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* Space between items */
+}
+
+.dropdown-section {
+    display: flex;
+    flex-direction: column; /* Default to column layout */
+    width: 45%; /* Make each field 45% width to fit two in a row */
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input[type="date"], input[type="text"], select {
+    padding: 10px; /* Increased padding */
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+/* Custom size for the branch dropdown */
+#branch {
+    width: 150px; /* Set custom width for branch dropdown */
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #0073e6;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #005bb5;
+}
+
+/* Footer styles */
+.footer {
+    text-align: center;
+    color: #f4f4f4;
+    margin-top: 20px;
+}
+
+.footer p {
+    background-color: rgb(70, 68, 68);
+    padding: 10px;
+}

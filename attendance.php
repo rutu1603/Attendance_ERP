@@ -14,13 +14,43 @@ $branchName = isset($_POST['branch']) ? $_POST['branch'] : '';
 $semesterName = isset($_POST['semester']) ? $_POST['semester'] : '';
 $divisionName = isset($_POST['division']) ? $_POST['division'] : '';
 $courseName = isset($_POST['course']) ? $_POST['course'] : '';
-$facultyName = isset($_POST['faculty']) ? $_POST['faculty'] : '';
+$theoryLabSelect = isset($_POST['TL']) ? $_POST['TL'] : '';
+$batchesSelect = isset($_POST['batch']) ? $_POST['batch'] : '';
 
-// Fetch filtered students based on the selected criteria
-$query = "SELECT roll_no, name FROM students WHERE branch_name = ? AND semester_name = ? AND division_name = ? AND course_name = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("ssss", $branchName, $semesterName, $divisionName, $courseName);
+// Prepare the query based on Theory/Lab selection
+if ($theoryLabSelect === 'Theory') {
+    // Query for Theory: filter students by course
+    $query = "
+        SELECT s.roll_no, s.name 
+        FROM students s
+        INNER JOIN student_course sc ON s.roll_no = sc.roll_no
+        WHERE s.branch_name = ? 
+        AND s.semester = ? 
+        AND s.division_name = ? 
+        AND sc.course = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ssss", $branchName, $semesterName, $divisionName, $courseName);
+} elseif ($theoryLabSelect === 'Lab') {
+    // Query for Lab: filter students by course and batch
+    $query = "
+        SELECT s.roll_no, s.name 
+        FROM students s
+        JOIN student_course sc ON s.roll_no = sc.roll_no
+        JOIN student_batch sb ON s.roll_no = sb.roll_no
+        WHERE s.branch_name = ? 
+        AND s.semester = ? 
+        AND s.division_name = ? 
+        AND sc.course = ? 
+        AND sb.batch = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sssss", $branchName, $semesterName, $divisionName, $courseName, $batchesSelect);
+} else {
+    // Handle case where Theory/Lab is not properly selected
+    echo "Error: Please select Theory or Lab.";
+    exit;
+}
 
+// Execute the query
 if ($stmt->execute()) {
     $result = $stmt->get_result();
 } else {
@@ -28,6 +58,7 @@ if ($stmt->execute()) {
     echo "Error: " . $stmt->error;
     exit;
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -98,7 +129,8 @@ if ($stmt->execute()) {
                 <p><b>Semester:</b> <?php echo htmlspecialchars($semesterName); ?></p>
                 <p><b>Division:</b> <?php echo htmlspecialchars($divisionName); ?></p>
                 <p><b>Course:</b> <?php echo htmlspecialchars($courseName); ?></p>
-                <p><b>Faculty:</b> <?php echo htmlspecialchars($facultyName); ?></p>
+                <p><b>T/L:</b> <?php echo htmlspecialchars($theoryLabSelect); ?></p>
+                <p><b>batch:</b> <?php echo htmlspecialchars($batchesSelect); ?></p>
             </div>
         </div>
 
@@ -109,7 +141,8 @@ if ($stmt->execute()) {
     <input type="hidden" name="semester" value="<?php echo htmlspecialchars($semesterName); ?>">
     <input type="hidden" name="division" value="<?php echo htmlspecialchars($divisionName); ?>">
     <input type="hidden" name="course" value="<?php echo htmlspecialchars($courseName); ?>">
-    <input type="hidden" name="faculty" value="<?php echo htmlspecialchars($facultyName); ?>">
+    <input type="hidden" name="TL" value="<?php echo htmlspecialchars($theoryLabSelect); ?>">
+    <input type="hidden" name="batch" value="<?php echo htmlspecialchars($batchesSelect); ?>">
 
     <table>
         <thead>

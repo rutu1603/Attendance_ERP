@@ -1,17 +1,18 @@
 <?php
+
+session_start();
+ 
+ header('Content-Type: application/json');
 include "connection.php";
 
-$sql = "SELECT  name FROM branch";
-$result = mysqli_query($conn, $sql);
+// Get the branch from the session
+$user_branch = isset($_SESSION['branch']) ? $_SESSION['branch'] : '';
 
-if (!$result) {
-    die("Query failed: " . mysqli_error($conn));
+if ($user_branch) {
+    echo json_encode(['branch' => $user_branch]);
+    
+} else {
+    echo json_encode(['error' => 'Branch not found.']);
 }
-
-$branches = [];
-while ($row = mysqli_fetch_assoc($result)) {
-    $branches[] = $row;
-}
-
-echo json_encode($branches);
+exit;
 ?>

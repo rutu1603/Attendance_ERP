@@ -1,16 +1,11 @@
 <?php
-session_start();
-include "connection.php";
+    session_start();
+    if (!isset($_SESSION['logged_in']) || $_SESSION['role'] !== 'faculty') {
+        header("Location: login.php");
+        exit();
+    }
 
-// Check if the user is logged in
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header("Location: login.php");
-    exit();
-}
-
-
-
-
+   
 
 ?>
 
@@ -19,7 +14,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Report</title>
+    <title>Faculty Page</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -29,20 +24,26 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         <img src="logo.png" alt="College Logo" class="logo">
         <h1>Vidyalankar Institute of Technology</h1>
         <div class="header-buttons">
-            <?php if(isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true): ?>
                 <button onclick="location.href='logout.php'">Logout</button>
             <?php else: ?>
                 <button onclick="location.href='login.php'">Login</button>
             <?php endif; ?>
         </div>
     </div>
-</header>
 
+    <div class="navbar-container">
+        <div class="navbar">
+            <a href="index.php">Home</a>
+            <a href="report.php">Report</a>
+        </div>
+    </div>
+</header>
 
 <main>
     <div class="container">
         <h2>Select Details</h2>
-        <form id="reportForm"  method="POST">
+        <form id="" action="attendance.php" method="POST">
            
 
             <div class="dropdown-section">
@@ -53,15 +54,9 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
             </div>
             <br>
             <div class="dropdown-section">
-        <label for="from_date">From Date:</label>
-        <input type="date" name="from_date" id="from_date" required>
-    </div>
-    
-
-    <div class="dropdown-section">
-        <label for="to_date">To Date:</label>
-        <input type="date" name="to_date" id="to_date" required>
-    </div>
+                <label for="date">Select Date:</label>
+                <input type="date" name="date" id="date" required>
+            </div>
 
             <div class="dropdown-section">
                 <label for="semester">Semester:</label>
@@ -109,5 +104,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
 
 <script src="js/script.js"></script>
+
+
+
 </body>
 </html>

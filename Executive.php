@@ -1,6 +1,13 @@
 <?php include "connection.php"; ?>
 <?php
 session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'executive') {
+    header("Location: login.php"); // Redirect if not faculty
+    exit();
+}
+
+// Fetch faculty's branch from session
+$faculty_branch = $_SESSION['branch_name'];
 ?>
 
 <!DOCTYPE html>
@@ -27,23 +34,19 @@ session_start();
     </div>
 
     <!-- Navbar just below the college name, integrated into the layout -->
-    <div class="navbar-container">
-        <div class="navbar">
-            <a href="index.php">Home</a>
-            <a href="faculty.php">Faculty</a>
-            <a href="report.php">Admin</a>
-            <!-- <a href="Executive.php">Executive</a> -->
-        </div>
+<div class="navbar-container">
+    <div class="navbar">
+        <a href="index.php">Home</a>
+        <a href="Executive.php">Executive</a>
     </div>
-    </header>
+</div>
+
+</header>
 
 <main>
-    <img src="vit.jpg" alt="vit" class="vit">
+    
 </main>
 
-<footer class='footer'>
-    <p ><b>Thenk you for visiting</b></p>
-</footer>
-<script src="js/script.js"></script>
+
 </body>
 </html>
